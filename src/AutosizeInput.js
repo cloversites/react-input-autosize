@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { polyfill } from 'react-lifecycles-compat';
 import PropTypes from 'prop-types';
 
 const sizerStyle = {
@@ -48,6 +49,7 @@ class AutosizeInput extends Component {
 	constructor (props) {
 		super(props);
 		this.state = {
+			lastId: props.id,
 			inputWidth: props.minWidth,
 			inputId: props.id || generateId(),
 		};
@@ -57,11 +59,12 @@ class AutosizeInput extends Component {
 		this.copyInputStyles();
 		this.updateInputWidth();
 	}
-	UNSAFE_componentWillReceiveProps (nextProps) {
-		const { id } = nextProps;
-		if (id !== this.props.id) {
-			this.setState({ inputId: id || generateId() });
+	static getDerivedStateFromProps (props, state) {
+		const { id } = props;
+		if (id !== state.lastId) {
+			return { inputId: id || generateId() };
 		}
+		return null;
 	}
 	componentDidUpdate (prevProps, prevState) {
 		if (prevState.inputWidth !== this.state.inputWidth) {
@@ -209,5 +212,7 @@ AutosizeInput.defaultProps = {
 	minWidth: 1,
 	injectStyles: true,
 };
+
+polyfill(AutosizeInput);
 
 export default AutosizeInput;

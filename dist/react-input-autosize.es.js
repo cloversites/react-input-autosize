@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { polyfill } from 'react-lifecycles-compat';
 import PropTypes from 'prop-types';
 
 var asyncGenerator = function () {
@@ -268,6 +269,7 @@ var AutosizeInput = function (_Component) {
 		};
 
 		_this.state = {
+			lastId: props.id,
 			inputWidth: props.minWidth,
 			inputId: props.id || generateId()
 		};
@@ -280,15 +282,6 @@ var AutosizeInput = function (_Component) {
 			this.mounted = true;
 			this.copyInputStyles();
 			this.updateInputWidth();
-		}
-	}, {
-		key: 'UNSAFE_componentWillReceiveProps',
-		value: function UNSAFE_componentWillReceiveProps(nextProps) {
-			var id = nextProps.id;
-
-			if (id !== this.props.id) {
-				this.setState({ inputId: id || generateId() });
-			}
 		}
 	}, {
 		key: 'componentDidUpdate',
@@ -418,6 +411,16 @@ var AutosizeInput = function (_Component) {
 				) : null
 			);
 		}
+	}], [{
+		key: 'getDerivedStateFromProps',
+		value: function getDerivedStateFromProps(props, state) {
+			var id = props.id;
+
+			if (id !== state.lastId) {
+				return { inputId: id || generateId() };
+			}
+			return null;
+		}
 	}]);
 	return AutosizeInput;
 }(Component);
@@ -445,5 +448,7 @@ AutosizeInput.defaultProps = {
 	minWidth: 1,
 	injectStyles: true
 };
+
+polyfill(AutosizeInput);
 
 export default AutosizeInput;
